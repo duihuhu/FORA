@@ -12,7 +12,7 @@ import enum
 #from torchvision.utils import save_image
 #from diffusers.models import AutoencoderKL
 from .diffusion_utils import discretized_gaussian_log_likelihood, normal_kl
-
+import time
 
 def mean_flat(tensor):
     """
@@ -273,6 +273,7 @@ class GaussianDiffusion:
                  - 'log_variance': the log of 'variance'.
                  - 'pred_xstart': the prediction for x_0.
         """
+        t1 = time.time()
         if model_kwargs is None:
             model_kwargs = {}
 
@@ -298,6 +299,7 @@ class GaussianDiffusion:
             model_output, extra = model_output
         else:
             extra = None
+        t2 = time.time()
 
         if self.model_var_type in [ModelVarType.LEARNED, ModelVarType.LEARNED_RANGE]:
             assert model_output.shape == (B, C * 2, *x.shape[2:])
@@ -324,6 +326,8 @@ class GaussianDiffusion:
             model_variance = _extract_into_tensor(model_variance, t, x.shape)
             model_log_variance = _extract_into_tensor(model_log_variance, t, x.shape)
 
+        t3 = time.time()
+
         def process_xstart(x):
             if denoised_fn is not None:
                 x = denoised_fn(x)
@@ -338,6 +342,8 @@ class GaussianDiffusion:
                 self._predict_xstart_from_eps(x_t=x, t=t, eps=model_output)
             )
         model_mean, _, _ = self.q_posterior_mean_variance(x_start=pred_xstart, x_t=x, t=t)
+        t4 = time.time()
+        print("p_mean_variance ", t4-t3, t3-t2, t2-t1)
 
         assert model_mean.shape == model_log_variance.shape == pred_xstart.shape == x.shape
         return {
