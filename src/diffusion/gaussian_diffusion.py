@@ -299,6 +299,7 @@ class GaussianDiffusion:
             model_output, extra = model_output
         else:
             extra = None
+        th.cuda.synchronize()
         t2 = time.time()
 
         if self.model_var_type in [ModelVarType.LEARNED, ModelVarType.LEARNED_RANGE]:
