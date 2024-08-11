@@ -43,7 +43,7 @@ def main(args):
     model.load_state_dict(state_dict)
     model.eval()  # important!
     diffusion = create_diffusion(str(args.num_sampling_steps))
-    vae = AutoencoderKL.from_pretrained(f"stabilityai/sd-vae-ft-{args.vae}").to(device)
+    vae = AutoencoderKL.from_pretrained(f"/home/jovyan/models/stable-diffusion-v1-5/models/snapshots/1d0c4ebf6ff58a5caecab40fa1406526bca4b5b9/vae").to(device)
 
     # Labels to condition the model with (feel free to change):
     # change ID number 15 to any other ImageNet category ID
