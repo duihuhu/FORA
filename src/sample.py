@@ -47,7 +47,7 @@ def main(args):
 
     # Labels to condition the model with (feel free to change):
     # change ID number 15 to any other ImageNet category ID
-    class_labels = [15] #Americal robin
+    class_labels = [207] #Americal robin
 
     # Create sampling noise:
     n = len(class_labels)
