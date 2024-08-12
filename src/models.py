@@ -137,6 +137,7 @@ class DiTBlock(nn.Module):
         cache_subtype = cache['cache_subtype']
 
         if cache_type == 'boost_infer_static':
+            print("step % int(cache_threshold) ", step % int(cache_threshold))
             if (step == int(numstep-1)) or (step % int(cache_threshold) == 0):
                 should_cache = True
             else:
