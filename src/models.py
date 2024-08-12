@@ -148,6 +148,20 @@ class DiTBlock(nn.Module):
                 cache[-1][layer]['mlp'] = self.mlp(modulate(self.norm2(x), shift_mlp, scale_mlp))
                 x = x + gate_mlp.unsqueeze(1) * cache[-1][layer]['mlp']
             else:
+                # 计算欧氏距离
+                compute_attention = self.attn(modulate(self.norm1(x), shift_msa, scale_msa))
+                euclidean_distance = torch.norm(compute_attention - cache[-1][layer]['attn'])
+                print("euclidean_distance compute_attention" , euclidean_distance.item())
+                
+                manhattan_distance = torch.sum(torch.abs(compute_attention - cache[-1][layer]['attn']))
+                print("manhattan_distance compute_attention" , manhattan_distance.item())
+
+                # 计算 Jaccard 相似度
+                intersection = torch.sum(compute_attention * cache[-1][layer]['attn'])
+                union = torch.sum((compute_attention + cache[-1][layer]['attn']) > 0)
+                jaccard_similarity = intersection / union
+                print("jaccard_similarity compute_attention", jaccard_similarity.item())
+                
                 x = x + gate_msa.unsqueeze(1) * cache[-1][layer]['attn']
                 x = x + gate_mlp.unsqueeze(1) * cache[-1][layer]['mlp']
 
@@ -158,21 +172,21 @@ class DiTBlock(nn.Module):
             x = x + gate_mlp.unsqueeze(1) * self.mlp(modulate(self.norm2(x), shift_mlp, scale_mlp))
 
         else:
-            attn_data_file = "attn_" + str(layer) + "_" + str(step) +".txt"
-            mlp_data_file = "mlp_" + str(layer) + "_" + str(step) +".txt"
+            # attn_data_file = "attn_" + str(layer) + "_" + str(step) +".txt"
+            # mlp_data_file = "mlp_" + str(layer) + "_" + str(step) +".txt"
             attn_data = self.attn(modulate(self.norm1(x), shift_msa, scale_msa))
             
             x = x + gate_msa.unsqueeze(1) * attn_data
             mlp_data =  self.mlp(modulate(self.norm2(x), shift_mlp, scale_mlp))
             x = x + gate_mlp.unsqueeze(1) * mlp_data
-            import numpy as np
-            attn_data_numpy_array = attn_data.cpu().numpy()
-            attn_data_numpy_array = attn_data_numpy_array.reshape(-1, attn_data_numpy_array.shape[-1])
+            # import numpy as np
+            # attn_data_numpy_array = attn_data.cpu().numpy()
+            # attn_data_numpy_array = attn_data_numpy_array.reshape(-1, attn_data_numpy_array.shape[-1])
 
-            np.savetxt(attn_data_file, attn_data_numpy_array, fmt='%f', delimiter=',')
-            mlp_data_numpy_array = mlp_data.cpu().numpy()
-            mlp_data_numpy_array = mlp_data_numpy_array.reshape(-1, mlp_data_numpy_array.shape[-1])
-            np.savetxt(mlp_data_file, mlp_data_numpy_array, fmt='%f', delimiter=',')
+            # np.savetxt(attn_data_file, attn_data_numpy_array, fmt='%f', delimiter=',')
+            # mlp_data_numpy_array = mlp_data.cpu().numpy()
+            # mlp_data_numpy_array = mlp_data_numpy_array.reshape(-1, mlp_data_numpy_array.shape[-1])
+            # np.savetxt(mlp_data_file, mlp_data_numpy_array, fmt='%f', delimiter=',')
 
         return x
 
