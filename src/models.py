@@ -167,8 +167,11 @@ class DiTBlock(nn.Module):
             x = x + gate_mlp.unsqueeze(1) * mlp_data
             import numpy as np
             attn_data_numpy_array = attn_data.cpu().numpy()
+            attn_data_numpy_array = attn_data_numpy_array.reshape(-1, attn_data_numpy_array.shape[-1])
+
             np.savetxt(attn_data_file, attn_data_numpy_array, fmt='%f', delimiter=',')
             mlp_data_numpy_array = mlp_data.cpu().numpy()
+            mlp_data_numpy_array = mlp_data_numpy_array.reshape(-1, mlp_data_numpy_array.shape[-1])
             np.savetxt(mlp_data_file, mlp_data_numpy_array, fmt='%f', delimiter=',')
 
         return x
