@@ -148,8 +148,6 @@ class DiTBlock(nn.Module):
                 cache[-1][layer]['mlp'] = self.mlp(modulate(self.norm2(x), shift_mlp, scale_mlp))
                 x = x + gate_mlp.unsqueeze(1) * cache[-1][layer]['mlp']
             else:
-                print("cache ", cache[-1][layer]['attn'])
-                print("no cache ", self.attn(modulate(self.norm1(x), shift_msa, scale_msa)))
                 x = x + gate_msa.unsqueeze(1) * cache[-1][layer]['attn']
                 x = x + gate_mlp.unsqueeze(1) * cache[-1][layer]['mlp']
 
@@ -160,9 +158,13 @@ class DiTBlock(nn.Module):
             x = x + gate_mlp.unsqueeze(1) * self.mlp(modulate(self.norm2(x), shift_mlp, scale_mlp))
 
         else:
-            x = x + gate_msa.unsqueeze(1) * self.attn(modulate(self.norm1(x), shift_msa, scale_msa))
-            x = x + gate_mlp.unsqueeze(1) * self.mlp(modulate(self.norm2(x), shift_mlp, scale_mlp))
-
+            attn_data = self.attn(modulate(self.norm1(x), shift_msa, scale_msa))
+            
+            x = x + gate_msa.unsqueeze(1) * attn_data
+            mlp_data =  self.mlp(modulate(self.norm2(x), shift_mlp, scale_mlp))
+            x = x + gate_mlp.unsqueeze(1) * mlp_data
+            if layer == 1:
+                print(attn_data)
         return x
 
 
