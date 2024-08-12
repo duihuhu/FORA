@@ -165,7 +165,7 @@ class DiTBlock(nn.Module):
             x = x + gate_msa.unsqueeze(1) * attn_data
             mlp_data =  self.mlp(modulate(self.norm2(x), shift_mlp, scale_mlp))
             x = x + gate_mlp.unsqueeze(1) * mlp_data
-            if layer==1:
+            if layer==3:
                 import numpy as np
                 attn_data_numpy_array = attn_data.cpu().numpy()
                 attn_data_numpy_array = attn_data_numpy_array.reshape(-1, attn_data_numpy_array.shape[-1])
