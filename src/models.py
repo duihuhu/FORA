@@ -143,15 +143,11 @@ class DiTBlock(nn.Module):
                 should_cache = False
 
             if should_cache:
-                print("store cache layer , step ", layer, step)
                 cache[-1][layer]['attn'] = self.attn(modulate(self.norm1(x), shift_msa, scale_msa))
                 x = x + gate_msa.unsqueeze(1) * cache[-1][layer]['attn']
                 cache[-1][layer]['mlp'] = self.mlp(modulate(self.norm2(x), shift_mlp, scale_mlp))
                 x = x + gate_mlp.unsqueeze(1) * cache[-1][layer]['mlp']
             else:
-                print("use cache layer , step ", layer, step)
-                print("use cache attention ", cache[-1][layer]['attn'])
-                print("compute cache attention ",self.attn(modulate(self.norm1(x), shift_msa, scale_msa)))
                 x = x + gate_msa.unsqueeze(1) * cache[-1][layer]['attn']
                 x = x + gate_mlp.unsqueeze(1) * cache[-1][layer]['mlp']
 
@@ -162,13 +158,19 @@ class DiTBlock(nn.Module):
             x = x + gate_mlp.unsqueeze(1) * self.mlp(modulate(self.norm2(x), shift_mlp, scale_mlp))
 
         else:
+            attn_data_file = "attn_" + str(layer) + "_" + str(step) +".txt"
+            mlp_data_file = "mlp_" + str(layer) + "_" + str(step) +".txt"
             attn_data = self.attn(modulate(self.norm1(x), shift_msa, scale_msa))
             
             x = x + gate_msa.unsqueeze(1) * attn_data
             mlp_data =  self.mlp(modulate(self.norm2(x), shift_mlp, scale_mlp))
             x = x + gate_mlp.unsqueeze(1) * mlp_data
-            if layer == 1:
-                print(attn_data)
+            import numpy as np
+            attn_data_numpy_array = attn_data.numpy()
+            np.savetxt(attn_data_file, attn_data_numpy_array, fmt='%f', delimiter=',')
+            mlp_data_numpy_array = mlp_data.numpy()
+            np.savetxt(mlp_data_file, mlp_data_numpy_array, fmt='%f', delimiter=',')
+
         return x
 
 
