@@ -166,9 +166,9 @@ class DiTBlock(nn.Module):
             mlp_data =  self.mlp(modulate(self.norm2(x), shift_mlp, scale_mlp))
             x = x + gate_mlp.unsqueeze(1) * mlp_data
             import numpy as np
-            attn_data_numpy_array = attn_data.numpy()
+            attn_data_numpy_array = attn_data.cpu().numpy()
             np.savetxt(attn_data_file, attn_data_numpy_array, fmt='%f', delimiter=',')
-            mlp_data_numpy_array = mlp_data.numpy()
+            mlp_data_numpy_array = mlp_data.cpu().numpy()
             np.savetxt(mlp_data_file, mlp_data_numpy_array, fmt='%f', delimiter=',')
 
         return x
