@@ -143,14 +143,15 @@ class DiTBlock(nn.Module):
                 should_cache = False
 
             if should_cache:
+                print("store cache layer , step ", layer, step)
                 cache[-1][layer]['attn'] = self.attn(modulate(self.norm1(x), shift_msa, scale_msa))
                 x = x + gate_msa.unsqueeze(1) * cache[-1][layer]['attn']
                 cache[-1][layer]['mlp'] = self.mlp(modulate(self.norm2(x), shift_mlp, scale_mlp))
                 x = x + gate_mlp.unsqueeze(1) * cache[-1][layer]['mlp']
             else:
-                print("layer , step ", layer, step)
-                print(cache[-1][layer]['attn'])
-                print(self.attn(modulate(self.norm1(x), shift_msa, scale_msa)))
+                print("use cache layer , step ", layer, step)
+                print("use cache attention ", cache[-1][layer]['attn'])
+                print("compute cache attention ",self.attn(modulate(self.norm1(x), shift_msa, scale_msa)))
                 x = x + gate_msa.unsqueeze(1) * cache[-1][layer]['attn']
                 x = x + gate_mlp.unsqueeze(1) * cache[-1][layer]['mlp']
 
