@@ -137,7 +137,6 @@ class DiTBlock(nn.Module):
         cache_subtype = cache['cache_subtype']
 
         if cache_type == 'boost_infer_static':
-            print("step % int(cache_threshold) ", step % int(cache_threshold))
             if (step == int(numstep-1)) or (step % int(cache_threshold) == 0):
                 should_cache = True
             else:
@@ -149,6 +148,8 @@ class DiTBlock(nn.Module):
                 cache[-1][layer]['mlp'] = self.mlp(modulate(self.norm2(x), shift_mlp, scale_mlp))
                 x = x + gate_mlp.unsqueeze(1) * cache[-1][layer]['mlp']
             else:
+                print("cache ", cache[-1][layer]['attn'])
+                print("no cache ", self.attn(modulate(self.norm1(x), shift_msa, scale_msa)))
                 x = x + gate_msa.unsqueeze(1) * cache[-1][layer]['attn']
                 x = x + gate_mlp.unsqueeze(1) * cache[-1][layer]['mlp']
 
