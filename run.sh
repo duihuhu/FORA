@@ -1,0 +1,1 @@
+python src/sample.py --save-cache 'boost_infer_static' --cache-subtype 'default' --cache-threshold '3' --image-size 512 --seed 1 --cfg-scale 1.5 --num-sampling-steps 250
